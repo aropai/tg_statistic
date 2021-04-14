@@ -9,6 +9,8 @@ def main():
     chat = json.load(chat_file)
     messages_count_by_sender = dict()
     for message in chat["messages"]:
+        if "from" not in message:
+            continue
         sender = message["from"]
         if sender in messages_count_by_sender:
             messages_count_by_sender[sender] += 1
