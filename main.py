@@ -9,6 +9,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("chat_file", type=open)
     arg = parser.parse_args()
+
     chat = json.load(arg.chat_file)
     messages_count_by_sender = dict()
     for message in chat["messages"]:
