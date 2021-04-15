@@ -2,7 +2,7 @@
 
 import json
 import argparse
-import pathlib
+import message_class
 
 
 def main():
@@ -10,12 +10,10 @@ def main():
     parser.add_argument("chat_file", type=open)
     arg = parser.parse_args()
 
-    chat = json.load(arg.chat_file)
+    messages = message_class.parse_chat(arg.chat_file)
     messages_count_by_sender = dict()
-    for message in chat["messages"]:
-        if "from" not in message:
-            continue
-        sender = message["from"]
+    for message in messages:
+        sender = message.sender
         if sender in messages_count_by_sender:
             messages_count_by_sender[sender] += 1
         else:
