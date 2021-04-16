@@ -19,16 +19,16 @@ class Chat:
     users: list
     messages: list
 
-    def find_sender(self, sender_id, sender_name):
-        sender = None
-        for user in self.users:
-            if user.id == sender_id:
-                sender = user
+    def get_user(self, user_id, user_name):
+        user = None
+        for other_user in self.users:
+            if other_user.id == user_id:
+                user = other_user
                 break
-        if not sender:
-            sender = User(name=sender_name, id=sender_id)
-            self.users.append(sender)
-        return sender
+        if not user:
+            user = User(name=user_name, id=user_id)
+            self.users.append(user)
+        return user
 
 
     @staticmethod
@@ -38,6 +38,6 @@ class Chat:
         for message in parsed_chat["messages"]:
             if "from" not in message:
                 continue
-            sender = chat.find_sender(int(message["from_id"]), message["from"])
+            sender = chat.get_user(int(message["from_id"]), message["from"])
             chat.messages.append(Message(sender=sender, text=message["text"]))
         return chat
