@@ -19,21 +19,24 @@ class Chat:
     users: list
     messages: list
 
-
-def load_chat(chat_file):
-    parsed_chat = json.load(chat_file)
-    chat = Chat(name=parsed_chat["name"], users=[], messages=[])
-    for message in parsed_chat["messages"]:
-        if "from" not in message:
-            continue
+    def append_message(self, message):
         sender = None
         sender_id = int(message["from_id"])
-        for user in chat.users:
+        for user in self.users:
             if user.id == sender_id:
                 sender = user
                 break
         if not sender:
             sender = User(name=message["from"], id=sender_id)
-            chat.users.append(sender)
-        chat.messages.append(Message(sender=sender, text=message["text"]))
-    return chat
+            self.users.append(sender)
+        self.messages.append(Message(sender=sender, text=message["text"]))
+
+    @staticmethod
+    def load_chat(chat_file):
+        parsed_chat = json.load(chat_file)
+        chat = Chat(name=parsed_chat["name"], users=[], messages=[])
+        for message in parsed_chat["messages"]:
+            if "from" not in message:
+                continue
+            chat.append_message(message)
+        return chat
