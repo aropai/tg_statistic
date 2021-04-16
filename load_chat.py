@@ -16,21 +16,23 @@ class Message:
 @dataclass
 class Chat:
     name: str
-    users: []
-    messages: []
+    users: [User]
+    messages: [Message]
 
 
 def load_chat(chat_file):
     parsed_chat = json.load(chat_file)
-    chat = Chat(parsed_chat["name"], [User(parsed_chat["name"], int(parsed_chat["id"]))], [])
+    chat = Chat(name=parsed_chat["name"], users=[], messages=[])
     for message in parsed_chat["messages"]:
         if "from" not in message:
             continue
-        sender = User(message["from"], int(message["from_id"]))
-        if sender not in chat.users:
+        sender = None
+        for user in chat.users:
+            if user.id == int(message["from_id"]):
+                sender = user
+                break
+        if not sender:
+            sender = User(name=message["from"], id=int(message["from_id"]))
             chat.users.append(sender)
-        if sender == chat.users[0]:
-            chat.messages.append(Message(chat.users[0], message["text"]))
-        else:
-            chat.messages.append(Message(chat.users[1], message["text"]))
+        chat.messages.append(Message(sender=sender, text=message["text"]))
     return chat
