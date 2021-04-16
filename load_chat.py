@@ -20,15 +20,15 @@ class Chat:
     messages: list
 
     def get_user(self, user_id, user_name):
-        user = None
-        for other_user in self.users:
-            if other_user.id == user_id:
-                user = other_user
+        found_user = None
+        for user in self.users:
+            if user.id == user_id:
+                found_user = user
                 break
-        if not user:
-            user = User(name=user_name, id=user_id)
-            self.users.append(user)
-        return user
+        if not found_user:
+            found_user = User(name=user_name, id=user_id)
+            self.users.append(found_user)
+        return found_user
 
 
     @staticmethod
