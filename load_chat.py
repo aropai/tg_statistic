@@ -19,17 +19,17 @@ class Chat:
     users: list
     messages: list
 
-    def append_message(self, message):
+    def find_sender(self, sender_id, sender_name):
         sender = None
-        sender_id = int(message["from_id"])
         for user in self.users:
             if user.id == sender_id:
                 sender = user
                 break
         if not sender:
-            sender = User(name=message["from"], id=sender_id)
+            sender = User(name=sender_name, id=sender_id)
             self.users.append(sender)
-        self.messages.append(Message(sender=sender, text=message["text"]))
+        return sender
+
 
     @staticmethod
     def load_chat(chat_file):
@@ -38,5 +38,6 @@ class Chat:
         for message in parsed_chat["messages"]:
             if "from" not in message:
                 continue
-            chat.append_message(message)
+            sender = chat.find_sender(int(message["from_id"]), message["from"])
+            chat.messages.append(Message(sender=sender, text=message["text"]))
         return chat
