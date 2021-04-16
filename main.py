@@ -2,7 +2,7 @@
 
 import json
 import argparse
-import message_class
+from load_chat import load_chat
 
 
 def main():
@@ -10,17 +10,17 @@ def main():
     parser.add_argument("chat_file", type=open)
     arg = parser.parse_args()
 
-    messages = message_class.parse_chat(arg.chat_file)
+    chat = load_chat(arg.chat_file)
     messages_count_by_sender = dict()
-    for message in messages:
-        sender = message.sender
-        if sender in messages_count_by_sender:
-            messages_count_by_sender[sender] += 1
+    for message in chat.messages:
+        name = message.sender.name
+        if name in messages_count_by_sender:
+            messages_count_by_sender[name] += 1
         else:
-            messages_count_by_sender[sender] = 1
+            messages_count_by_sender[name] = 1
 
-    for sender in messages_count_by_sender:
-        print(f"{sender} wrote {messages_count_by_sender[sender]} message(s)")
+    for name in messages_count_by_sender:
+        print(f"{name} wrote {messages_count_by_sender[name]} message(s)")
 
 
 if __name__ == "__main__":
