@@ -16,8 +16,8 @@ class Message:
 @dataclass
 class Chat:
     name: str
-    users: [User]
-    messages: [Message]
+    users: list
+    messages: list
 
 
 def load_chat(chat_file):
@@ -27,12 +27,13 @@ def load_chat(chat_file):
         if "from" not in message:
             continue
         sender = None
+        sender_id = int(message["from_id"])
         for user in chat.users:
-            if user.id == int(message["from_id"]):
+            if user.id == sender_id:
                 sender = user
                 break
         if not sender:
-            sender = User(name=message["from"], id=int(message["from_id"]))
+            sender = User(name=message["from"], id=sender_id)
             chat.users.append(sender)
         chat.messages.append(Message(sender=sender, text=message["text"]))
     return chat
