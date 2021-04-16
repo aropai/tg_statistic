@@ -3,15 +3,18 @@
 from dataclasses import dataclass
 import json
 
+
 @dataclass
 class User:
     name: str
     id: int
 
+
 @dataclass
 class Message:
     sender: User
     text: str
+
 
 @dataclass
 class Chat:
@@ -29,7 +32,6 @@ class Chat:
             found_user = User(name=user_name, id=user_id)
             self.users.append(found_user)
         return found_user
-
 
     @staticmethod
     def load_chat(chat_file):
