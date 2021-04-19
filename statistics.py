@@ -1,44 +1,45 @@
 #!/usr/bin/python3
 
 
-def count_messages(chat):
-    count_messages_by_sender = dict()
+def _get_messages_count_by_sender(chat):
+    messages_count_by_sender = dict()
     for message in chat.messages:
-        user = message.sender
-        if user in count_messages_by_sender:
-            count_messages_by_sender[user] += 1
+        sender = message.sender
+        if sender in messages_count_by_sender:
+            messages_count_by_sender[sender] += 1
         else:
-            count_messages_by_sender[user] = 1
+            messages_count_by_sender[sender] = 1
 
-    return count_messages_by_sender
+    return messages_count_by_sender
 
 
-def count_len_of_messages(chat):
-    count_len_by_sender = dict()
+def _get_total_messages_length_by_sender(chat):
+    total_messages_length_by_sender = dict()
     for message in chat.messages:
-        user = message.sender
-        if user in count_len_by_sender:
-            count_len_by_sender[user] += len(message.text)
+        sender = message.sender
+        if sender in total_messages_length_by_sender:
+            total_messages_length_by_sender[sender] += len(message.text)
         else:
-            count_len_by_sender[user] = len(message.text)
+            total_messages_length_by_sender[sender] = len(message.text)
 
-    return count_len_by_sender
-
-
-def amount_of_messages(chat):
-    count_messages_by_sender = count_messages(chat)
-    for user in count_messages_by_sender:
-        print(f"{user.name} wrote {count_messages_by_sender[user]} message(s)")
+    return total_messages_length_by_sender
 
 
-def full_len_of_messages(chat):
-    count_len_by_sender = count_len_of_messages(chat)
-    for user in count_len_by_sender:
-        print(f"{user.name} wrote {count_len_by_sender[user]} symbol(s)")
+def print_messages_count_by_sender(chat):
+    messages_count_by_sender = _get_messages_count_by_sender(chat)
+    for sender in messages_count_by_sender:
+        print(f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)")
 
 
-def average_len_of_message(chat):
-    count_len_by_sender = count_len_of_messages(chat)
-    count_messages_by_sender = count_messages(chat)
-    for user in count_messages_by_sender:
-        print(f"The average len of {user.name}'s message is {round(count_len_by_sender[user] / count_messages_by_sender[user], 2)} symbols")
+def print_total_messages_length_by_sender(chat):
+    total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
+    for sender in total_messages_length_by_sender:
+        print(f"{sender.name} wrote {total_messages_length_by_sender[sender]} symbol(s)")
+
+
+def print_average_messages_length_by_sender(chat):
+    total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
+    messages_count_by_sender = _get_messages_count_by_sender(chat)
+    for sender in messages_count_by_sender:
+        print(
+            f"The average len of {sender.name}'s message is {round(total_messages_length_by_sender[sender] / messages_count_by_sender[sender], 2)} symbols")

@@ -12,9 +12,9 @@ def main():
     arg = parser.parse_args()
 
     chat = Chat.load_chat(arg.chat_file)
-    statistics.amount_of_messages(chat)
-    statistics.full_len_of_messages(chat)
-    statistics.average_len_of_message(chat)
+    statistics.print_messages_count_by_sender(chat)
+    statistics.print_total_messages_length_by_sender(chat)
+    statistics.print_average_messages_length_by_sender(chat)
 
 
 if __name__ == "__main__":
