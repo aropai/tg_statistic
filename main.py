@@ -3,6 +3,7 @@
 import json
 import argparse
 from load_chat import Chat
+import statistics
 
 
 def main():
@@ -11,16 +12,9 @@ def main():
     arg = parser.parse_args()
 
     chat = Chat.load_chat(arg.chat_file)
-    messages_count_by_sender = dict()
-    for message in chat.messages:
-        name = message.sender.name
-        if name in messages_count_by_sender:
-            messages_count_by_sender[name] += 1
-        else:
-            messages_count_by_sender[name] = 1
-
-    for name in messages_count_by_sender:
-        print(f"{name} wrote {messages_count_by_sender[name]} message(s)")
+    statistics.amount_of_messages(chat)
+    statistics.full_len_of_messages(chat)
+    statistics.average_len_of_message(chat)
 
 
 if __name__ == "__main__":
