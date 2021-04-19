@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import json
 
 
-@dataclass
+@dataclass(frozen=True)
 class User:
     name: str
     id: int

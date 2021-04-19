@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import json
 import argparse
 from load_chat import Chat
 
@@ -13,14 +12,14 @@ def main():
     chat = Chat.load_chat(arg.chat_file)
     messages_count_by_sender = dict()
     for message in chat.messages:
-        name = message.sender.name
-        if name in messages_count_by_sender:
-            messages_count_by_sender[name] += 1
+        user = message.sender
+        if user in messages_count_by_sender:
+            messages_count_by_sender[user] += 1
         else:
-            messages_count_by_sender[name] = 1
+            messages_count_by_sender[user] = 1
 
-    for name in messages_count_by_sender:
-        print(f"{name} wrote {messages_count_by_sender[name]} message(s)")
+    for user in messages_count_by_sender:
+        print(f"{user.name} wrote {messages_count_by_sender[user]} message(s)")
 
 
 if __name__ == "__main__":
