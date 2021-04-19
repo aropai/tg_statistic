@@ -39,7 +39,7 @@ def print_average_messages_length_by_sender(chat):
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     messages_count_by_sender = _get_messages_count_by_sender(chat)
     for sender in messages_count_by_sender:
-        average_messages_length_by_sender = round(
+        average_message_length = round(
             total_messages_length_by_sender[sender] / messages_count_by_sender[sender], 2
         )
-        print(f"The average len of {sender.name}'s message is {average_messages_length_by_sender} symbols")
+        print(f"The average len of {sender.name}'s message is {average_message_length} symbols")
