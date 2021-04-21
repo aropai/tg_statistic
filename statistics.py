@@ -1,8 +1,8 @@
 from load_chat import Chat
 
 
-def statistic(name: str):
-    def decorator(function):
+def statistic(name: str) -> None:
+    def decorator(function: str) -> None:
         def wrapper(chat: Chat) -> None:
             func = function(chat)
             print("=" * 25 + "  " + name.upper() + "  " + 25 * "=")
