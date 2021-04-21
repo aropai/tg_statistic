@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import json
-from typing import IO
+from typing import IO, List
 
 
 @dataclass(frozen=True)
@@ -19,8 +19,8 @@ class Message:
 @dataclass
 class Chat:
     name: str
-    users: list
-    messages: list
+    users: List[User]
+    messages: List[Message]
 
     def get_user(self, user_id: int, user_name: str) -> User:
         found_user = None

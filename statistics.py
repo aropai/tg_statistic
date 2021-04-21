@@ -1,8 +1,9 @@
-from load_chat import Chat
+from load_chat import Chat, User
+from typing import Dict
 
 
-def _get_messages_count_by_sender(chat: Chat) -> dict:
-    messages_count_by_sender: dict = dict()
+def _get_messages_count_by_sender(chat: Chat) -> Dict[User, int]:
+    messages_count_by_sender: Dict[User, int] = dict()
     for message in chat.messages:
         sender = message.sender
         if sender not in messages_count_by_sender:
@@ -12,8 +13,8 @@ def _get_messages_count_by_sender(chat: Chat) -> dict:
     return messages_count_by_sender
 
 
-def _get_total_messages_length_by_sender(chat: Chat) -> dict:
-    total_messages_length_by_sender: dict = dict()
+def _get_total_messages_length_by_sender(chat: Chat) -> Dict[User, int]:
+    total_messages_length_by_sender: Dict[User, int] = dict()
     for message in chat.messages:
         sender = message.sender
         if sender not in total_messages_length_by_sender:
