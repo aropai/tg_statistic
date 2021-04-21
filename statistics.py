@@ -5,10 +5,11 @@ from typing import Dict, Callable
 def statistic(name: str) -> Callable[[Callable[[Chat], None]], Callable[[Chat], None]]:
     def decorator(function: Callable[[Chat], None]) -> Callable[[Chat], None]:
         def wrapper(chat: Chat) -> None:
-            number_of_eq = (80 - len(name) - 4) // 2
-            print(("=" * number_of_eq + "  " + name.upper() + "  " + number_of_eq * "=").center(80))
+            length_of_output = 80
+            print(f" {name.upper()} ".center(length_of_output, "="))
             function(chat)
-            print("=" * 80, "\n")
+            print("=" * length_of_output)
+            print()
 
         return wrapper
 
