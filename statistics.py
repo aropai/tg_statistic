@@ -1,19 +1,18 @@
-def uppercase_decorator(function):
-    def wrapper(arg):
-        func = function(arg)
-        make_uppercase = 10 * "=" + func.upper()
-        print(make_uppercase)
+from load_chat import Chat
 
-    return wrapper
 
-def my_decorator(function):
-    def wrapper(arg):
-        func = function(arg)
-        print("=" * 10 + "  "+ function.__name__ + "  " + 10 * "=")
-        print(func)
-        print("=" * 30)
+def statistic(name: str):
+    def decorator(function):
+        def wrapper(chat: Chat) -> None:
+            func = function(chat)
+            print("=" * 25 + "  " + name.upper() + "  " + 25 * "=")
+            print(func[:-1])
+            print("=" * 80, "\n\n")
 
-    return wrapper
+        return wrapper
+
+    return decorator
+
 
 def _get_messages_count_by_sender(chat):
     messages_count_by_sender = dict()
@@ -36,26 +35,33 @@ def _get_total_messages_length_by_sender(chat):
 
     return total_messages_length_by_sender
 
-@my_decorator
+
+@statistic(name="number of messages")
 def print_messages_count_by_sender(chat):
     messages_count_by_sender = _get_messages_count_by_sender(chat)
-    res = ""
+    string_to_print: str = ""
     for sender in messages_count_by_sender:
-        res += f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)\n"
-    return res
+        string_to_print += f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)\n"
+    return string_to_print
 
 
+@statistic(name="total length of messages")
 def print_total_messages_length_by_sender(chat):
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
+    string_to_print: str = ""
     for sender in total_messages_length_by_sender:
-        print(f"{sender.name} wrote {total_messages_length_by_sender[sender]} symbol(s)")
+        string_to_print += f"{sender.name} wrote {total_messages_length_by_sender[sender]} symbol(s)\n"
+    return string_to_print
 
 
+@statistic(name="average len of message")
 def print_average_messages_length_by_sender(chat):
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     messages_count_by_sender = _get_messages_count_by_sender(chat)
+    string_to_print: str = ""
     for sender in messages_count_by_sender:
         average_message_length = round(
             total_messages_length_by_sender[sender] / messages_count_by_sender[sender], 2
         )
-        print(f"The average len of {sender.name}'s message is {average_message_length} symbols")
+        string_to_print += f"The average len of {sender.name}'s message is {average_message_length} symbols\n"
+    return string_to_print
