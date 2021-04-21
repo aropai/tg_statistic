@@ -1,5 +1,19 @@
-#!/usr/bin/python3
+def uppercase_decorator(function):
+    def wrapper(arg):
+        func = function(arg)
+        make_uppercase = 10 * "=" + func.upper()
+        print(make_uppercase)
 
+    return wrapper
+
+def my_decorator(function):
+    def wrapper(arg):
+        func = function(arg)
+        print("=" * 10 + "  "+ function.__name__ + "  " + 10 * "=")
+        print(func)
+        print("=" * 30)
+
+    return wrapper
 
 def _get_messages_count_by_sender(chat):
     messages_count_by_sender = dict()
@@ -22,11 +36,13 @@ def _get_total_messages_length_by_sender(chat):
 
     return total_messages_length_by_sender
 
-
+@my_decorator
 def print_messages_count_by_sender(chat):
     messages_count_by_sender = _get_messages_count_by_sender(chat)
+    res = ""
     for sender in messages_count_by_sender:
-        print(f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)")
+        res += f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)\n"
+    return res
 
 
 def print_total_messages_length_by_sender(chat):
