@@ -1,7 +1,7 @@
-#!/usr/bin/python3
-
+from __future__ import annotations
 from dataclasses import dataclass
 import json
+from typing import IO
 
 
 @dataclass(frozen=True)
@@ -22,7 +22,7 @@ class Chat:
     users: list
     messages: list
 
-    def get_user(self, user_id, user_name):
+    def get_user(self, user_id: int, user_name: str) -> User:
         found_user = None
         for user in self.users:
             if user.id == user_id:
@@ -34,7 +34,7 @@ class Chat:
         return found_user
 
     @staticmethod
-    def load_chat(chat_file):
+    def load_chat(chat_file: IO) -> Chat:
         parsed_chat = json.load(chat_file)
         chat = Chat(name=parsed_chat["name"], users=[], messages=[])
         for message in parsed_chat["messages"]:
