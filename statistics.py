@@ -1,8 +1,9 @@
-#!/usr/bin/python3
+from load_chat import Chat, User
+from typing import Dict
 
 
-def _get_messages_count_by_sender(chat):
-    messages_count_by_sender = dict()
+def _get_messages_count_by_sender(chat: Chat) -> Dict[User, int]:
+    messages_count_by_sender: Dict[User, int] = dict()
     for message in chat.messages:
         sender = message.sender
         if sender not in messages_count_by_sender:
@@ -12,8 +13,8 @@ def _get_messages_count_by_sender(chat):
     return messages_count_by_sender
 
 
-def _get_total_messages_length_by_sender(chat):
-    total_messages_length_by_sender = dict()
+def _get_total_messages_length_by_sender(chat: Chat) -> Dict[User, int]:
+    total_messages_length_by_sender: Dict[User, int] = dict()
     for message in chat.messages:
         sender = message.sender
         if sender not in total_messages_length_by_sender:
@@ -23,19 +24,19 @@ def _get_total_messages_length_by_sender(chat):
     return total_messages_length_by_sender
 
 
-def print_messages_count_by_sender(chat):
+def print_messages_count_by_sender(chat: Chat) -> None:
     messages_count_by_sender = _get_messages_count_by_sender(chat)
     for sender in messages_count_by_sender:
         print(f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)")
 
 
-def print_total_messages_length_by_sender(chat):
+def print_total_messages_length_by_sender(chat: Chat) -> None:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     for sender in total_messages_length_by_sender:
         print(f"{sender.name} wrote {total_messages_length_by_sender[sender]} symbol(s)")
 
 
-def print_average_messages_length_by_sender(chat):
+def print_average_messages_length_by_sender(chat: Chat) -> None:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     messages_count_by_sender = _get_messages_count_by_sender(chat)
     for sender in messages_count_by_sender:

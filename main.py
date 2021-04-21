@@ -1,12 +1,11 @@
 #!/usr/bin/python3
 
-import json
 import argparse
 from load_chat import Chat
 import statistics
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("chat_file", type=open)
     arg = parser.parse_args()
