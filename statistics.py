@@ -1,4 +1,5 @@
-from load_chat import Chat
+from load_chat import Chat, User
+from typing import Dict
 
 
 def statistic(name: str) -> None:
@@ -14,8 +15,8 @@ def statistic(name: str) -> None:
     return decorator
 
 
-def _get_messages_count_by_sender(chat):
-    messages_count_by_sender = dict()
+def _get_messages_count_by_sender(chat: Chat) -> Dict[User, int]:
+    messages_count_by_sender: Dict[User, int] = dict()
     for message in chat.messages:
         sender = message.sender
         if sender not in messages_count_by_sender:
@@ -25,8 +26,8 @@ def _get_messages_count_by_sender(chat):
     return messages_count_by_sender
 
 
-def _get_total_messages_length_by_sender(chat):
-    total_messages_length_by_sender = dict()
+def _get_total_messages_length_by_sender(chat: Chat) -> Dict[User, int]:
+    total_messages_length_by_sender: Dict[User, int] = dict()
     for message in chat.messages:
         sender = message.sender
         if sender not in total_messages_length_by_sender:
@@ -37,7 +38,7 @@ def _get_total_messages_length_by_sender(chat):
 
 
 @statistic(name="number of messages")
-def print_messages_count_by_sender(chat):
+def print_messages_count_by_sender(chat: Chat) -> str:
     messages_count_by_sender = _get_messages_count_by_sender(chat)
     string_to_print: str = ""
     for sender in messages_count_by_sender:
@@ -46,7 +47,7 @@ def print_messages_count_by_sender(chat):
 
 
 @statistic(name="total length of messages")
-def print_total_messages_length_by_sender(chat):
+def print_total_messages_length_by_sender(chat: Chat) -> str:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     string_to_print: str = ""
     for sender in total_messages_length_by_sender:
@@ -55,7 +56,7 @@ def print_total_messages_length_by_sender(chat):
 
 
 @statistic(name="average len of message")
-def print_average_messages_length_by_sender(chat):
+def print_average_messages_length_by_sender(chat: Chat) -> str:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     messages_count_by_sender = _get_messages_count_by_sender(chat)
     string_to_print: str = ""
