@@ -1,14 +1,15 @@
 from load_chat import Chat, User
 from typing import Dict, Callable
 
+BORDERS_LENGTH = 80
+
 
 def statistic(name: str) -> Callable[[Callable[[Chat], None]], Callable[[Chat], None]]:
-    def decorator(function: Callable[[Chat], None]) -> Callable[[Chat], None]:
+    def decorator(statistic_function: Callable[[Chat], None]) -> Callable[[Chat], None]:
         def wrapper(chat: Chat) -> None:
-            length_of_output = 80
-            print(f" {name.upper()} ".center(length_of_output, "="))
-            function(chat)
-            print("=" * length_of_output)
+            print(f" {name.upper()} ".center(BORDERS_LENGTH, "="))
+            statistic_function(chat)
+            print("=" * BORDERS_LENGTH)
             print()
 
         return wrapper
