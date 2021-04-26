@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import json
-from typing import IO, List
+from typing import IO, List, Optional
 
 
 @dataclass(frozen=True)
@@ -13,6 +13,8 @@ class User:
 @dataclass
 class Message:
     sender: User
+    id: int
+    reply_to_message_id: Optional[int]
     text: str
 
 
@@ -33,6 +35,18 @@ class Chat:
             self.users.append(found_user)
         return found_user
 
+    def get_message(self, message_id: int) -> Message:
+        left_board = 0
+        right_board = len(self.messages)
+        while right_board - left_board != 1:
+            m = (right_board + left_board) // 2
+            if self.messages[m].id <= message_id:
+                left_board = m
+            else:
+                right_board = m
+        return self.messages[left_board]
+
+
     @staticmethod
     def load_chat(chat_file: IO) -> Chat:
         parsed_chat = json.load(chat_file)
@@ -41,5 +55,8 @@ class Chat:
             if "from" not in message:
                 continue
             sender = chat.get_user(int(message["from_id"]), message["from"])
-            chat.messages.append(Message(sender=sender, text=message["text"]))
+            new_message = Message(sender=sender, id=message["id"], reply_to_message_id=None, text=message["text"])
+            if "reply_to_message_id" in message:
+                new_message.reply_to_message_id = int(message["reply_to_message_id"])
+            chat.messages.append(new_message)
         return chat
