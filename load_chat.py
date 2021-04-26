@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import json
-from typing import IO, List, Optional
+from typing import IO, List, Optional, Dict
 
 
 @dataclass(frozen=True)
@@ -23,6 +23,7 @@ class Chat:
     name: str
     users: List[User]
     messages: List[Message]
+    messags_by_id: Dict[int, Message]
 
     def get_user(self, user_id: int, user_name: str) -> User:
         found_user = None
@@ -35,28 +36,18 @@ class Chat:
             self.users.append(found_user)
         return found_user
 
-    def get_message(self, message_id: int) -> Message:
-        left_border = 0
-        right_border = len(self.messages)
-        while right_border - left_border != 1:
-            m = (right_border + left_border) // 2
-            if self.messages[m].id <= message_id:
-                left_border = m
-            else:
-                right_border = m
-        return self.messages[left_border]
-
 
     @staticmethod
     def load_chat(chat_file: IO) -> Chat:
         parsed_chat = json.load(chat_file)
-        chat = Chat(name=parsed_chat["name"], users=[], messages=[])
+        chat = Chat(name=parsed_chat["name"], users=[], messages=[], messags_by_id=dict())
         for message in parsed_chat["messages"]:
             if "from" not in message:
                 continue
             sender = chat.get_user(int(message["from_id"]), message["from"])
-            new_message = Message(sender=sender, id=message["id"], reply_to_message_id=None, text=message["text"])
+            parsed_message = Message(sender=sender, id=message["id"], reply_to_message_id=None, text=message["text"])
             if "reply_to_message_id" in message:
-                new_message.reply_to_message_id = int(message["reply_to_message_id"])
-            chat.messages.append(new_message)
+                parsed_message.reply_to_message_id = int(message["reply_to_message_id"])
+            chat.messages.append(parsed_message)
+            chat.messags_by_id[parsed_message.id] = chat.messages[-1]
         return chat
