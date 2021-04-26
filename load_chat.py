@@ -36,15 +36,15 @@ class Chat:
         return found_user
 
     def get_message(self, message_id: int) -> Message:
-        left_board = 0
-        right_board = len(self.messages)
-        while right_board - left_board != 1:
-            m = (right_board + left_board) // 2
+        left_border = 0
+        right_border = len(self.messages)
+        while right_border - left_border != 1:
+            m = (right_border + left_border) // 2
             if self.messages[m].id <= message_id:
-                left_board = m
+                left_border = m
             else:
-                right_board = m
-        return self.messages[left_board]
+                right_border = m
+        return self.messages[left_border]
 
 
     @staticmethod
