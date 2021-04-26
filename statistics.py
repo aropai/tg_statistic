@@ -70,7 +70,7 @@ def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
         if not message.reply_to_message_id:
             continue
         sender = message.sender
-        replied_message = chat.messages_by_id[message.reply_to_message_id]
+        replied_message = chat.message_by_id[message.reply_to_message_id]
         if sender not in replies_count_by_users:
             replies_count_by_users[sender] = dict()
         if replied_message.sender not in replies_count_by_users[sender]:
@@ -86,7 +86,7 @@ def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
         if not message.reply_to_message_id:
             continue
         sender = message.sender
-        replied_message = chat.messages_by_id[message.reply_to_message_id]
+        replied_message = chat.message_by_id[message.reply_to_message_id]
         if replied_message.sender not in replies_count_to_users:
             replies_count_to_users[replied_message.sender] = dict()
         if sender not in replies_count_to_users[replied_message.sender]:
