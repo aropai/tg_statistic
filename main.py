@@ -14,6 +14,8 @@ def main() -> None:
     statistics.print_messages_count_by_sender(chat)
     statistics.print_total_messages_length_by_sender(chat)
     statistics.print_average_messages_length_by_sender(chat)
+    statistics.print_most_often_replies(chat)
+    statistics.print_most_often_replies_to(chat)
 
 
 if __name__ == "__main__":
