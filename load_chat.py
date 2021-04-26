@@ -23,7 +23,7 @@ class Chat:
     name: str
     users: List[User]
     messages: List[Message]
-    messags_by_id: Dict[int, Message]
+    messages_by_id: Dict[int, Message]
 
     def get_user(self, user_id: int, user_name: str) -> User:
         found_user = None
@@ -40,7 +40,7 @@ class Chat:
     @staticmethod
     def load_chat(chat_file: IO) -> Chat:
         parsed_chat = json.load(chat_file)
-        chat = Chat(name=parsed_chat["name"], users=[], messages=[], messags_by_id=dict())
+        chat = Chat(name=parsed_chat["name"], users=[], messages=[], messages_by_id=dict())
         for message in parsed_chat["messages"]:
             if "from" not in message:
                 continue
@@ -49,5 +49,5 @@ class Chat:
             if "reply_to_message_id" in message:
                 parsed_message.reply_to_message_id = int(message["reply_to_message_id"])
             chat.messages.append(parsed_message)
-            chat.messags_by_id[parsed_message.id] = chat.messages[-1]
+            chat.messages_by_id[parsed_message.id] = parsed_message
         return chat

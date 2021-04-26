@@ -70,7 +70,7 @@ def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
         if not message.reply_to_message_id:
             continue
         sender = message.sender
-        replied_message = chat.messags_by_id[message.reply_to_message_id]
+        replied_message = chat.messages_by_id[message.reply_to_message_id]
         if sender not in replies_count_by_users:
             replies_count_by_users[sender] = dict()
         if replied_message.sender not in replies_count_by_users[sender]:
@@ -86,7 +86,7 @@ def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
         if not message.reply_to_message_id:
             continue
         sender = message.sender
-        replied_message = chat.messags_by_id[message.reply_to_message_id]
+        replied_message = chat.messages_by_id[message.reply_to_message_id]
         if replied_message.sender not in replies_count_to_users:
             replies_count_to_users[replied_message.sender] = dict()
         if sender not in replies_count_to_users[replied_message.sender]:
@@ -96,13 +96,18 @@ def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
     return replies_count_to_users
 
 
+def _get_top_replies(replies_count: Dict[User, int]) -> List[Tuple[User, int]]:
+    top_replies = list(replies_count.items())
+    top_replies.sort(key=lambda x: -x[1])
+    top_replies = top_replies[:3]
+    return top_replies
+
+
 @statistic(name="most often replies")
 def print_most_often_replies(chat: Chat) -> None:
     replies_count_by_users = _get_replies_count_by_users(chat)
     for sender in replies_count_by_users:
-        top_replies = list(replies_count_by_users[sender].items())
-        top_replies.sort(key=lambda x: -x[1])
-        top_replies = top_replies[:3]
+        top_replies = _get_top_replies(replies_count_by_users[sender])
         if len(top_replies) == 0:
             print(f"{sender.name} replies nobody", end="")
         else:
@@ -116,9 +121,7 @@ def print_most_often_replies(chat: Chat) -> None:
 def print_most_often_replies_to(chat: Chat) -> None:
     replies_count_to_users = _get_replies_count_to_users(chat)
     for replied_sender in replies_count_to_users:
-        top_replies = list(replies_count_to_users[replied_sender].items())
-        top_replies.sort(key=lambda x: -x[1])
-        top_replies = top_replies[:3]
+        top_replies = _get_top_replies(replies_count_to_users[replied_sender])
         if len(top_replies) == 0:
             print(f"Nobody replies to {replied_sender.name}", end="")
         else:
