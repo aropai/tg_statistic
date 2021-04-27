@@ -39,8 +39,8 @@ def _get_total_messages_length_by_sender(chat: Chat) -> Dict[User, int]:
     return total_messages_length_by_sender
 
 
-def _sorted_by_value(messages_by_sender: Dict[User, int]) -> List[User]:
-    return sorted(messages_by_sender, key=lambda sender: -messages_by_sender[sender])
+def _sorted_by_value(value_by_sender: Dict[User, int]) -> List[User]:
+    return sorted(value_by_sender, key=lambda sender: -value_by_sender[sender])
 
 
 @statistic(name="number of messages")
@@ -58,14 +58,15 @@ def print_total_messages_length_by_sender(chat: Chat) -> None:
 
 
 @statistic(name="average len of message")
-def print_average_messages_length_by_sender(chat: Chat) -> None:
+def print_average_message_length_by_sender(chat: Chat) -> None:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     messages_count_by_sender = _get_messages_count_by_sender(chat)
-    average_messages_length_by_sender: Dict[User, int] = dict()
+    average_message_length_by_sender: Dict[User, int] = dict()
     for sender in total_messages_length_by_sender:
-        average_messages_length_by_sender[sender] = int(100 * total_messages_length_by_sender[sender] / messages_count_by_sender[sender])
-    for sender in _sorted_by_value(average_messages_length_by_sender):
-        print(f"The average len of {sender.name}'s message is {average_messages_length_by_sender[sender] / 100} symbols")
+        average_message_length_by_sender[sender] = int(
+            100 * total_messages_length_by_sender[sender] / messages_count_by_sender[sender])
+    for sender in _sorted_by_value(average_message_length_by_sender):
+        print(f"The average len of {sender.name}'s message is {average_message_length_by_sender[sender] / 100} symbols")
 
 
 def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
