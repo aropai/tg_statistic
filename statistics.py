@@ -2,7 +2,7 @@ from load_chat import Chat, User, Message
 from typing import Dict, Callable, List, Tuple
 import re
 
-BORDERS_LENGTH = 80
+BORDERS_LENGTH = 120
 
 
 def statistic(name: str) -> Callable[[Callable[[Chat], None]], Callable[[Chat], None]]:
@@ -40,29 +40,35 @@ def _get_total_messages_length_by_sender(chat: Chat) -> Dict[User, int]:
     return total_messages_length_by_sender
 
 
+def _sorted_by_value(value_by_sender: Dict[User, int]) -> List[User]:
+    return sorted(value_by_sender, key=lambda sender: -value_by_sender[sender])
+
+
 @statistic(name="number of messages")
 def print_messages_count_by_sender(chat: Chat) -> None:
     messages_count_by_sender = _get_messages_count_by_sender(chat)
-    for sender in messages_count_by_sender:
-        print(f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)")
+    for sender in _sorted_by_value(messages_count_by_sender):
+        print(f"{sender.name:20} wrote {messages_count_by_sender[sender]:<6} message(s)")
 
 
 @statistic(name="total length of messages")
 def print_total_messages_length_by_sender(chat: Chat) -> None:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
-    for sender in total_messages_length_by_sender:
-        print(f"{sender.name} wrote {total_messages_length_by_sender[sender]} symbol(s)")
+    for sender in _sorted_by_value(total_messages_length_by_sender):
+        print(f"{sender.name:20} wrote {total_messages_length_by_sender[sender]:<8} symbol(s)")
 
 
 @statistic(name="average len of message")
-def print_average_messages_length_by_sender(chat: Chat) -> None:
+def print_average_message_length_by_sender(chat: Chat) -> None:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     messages_count_by_sender = _get_messages_count_by_sender(chat)
-    for sender in messages_count_by_sender:
-        average_message_length = round(
-            total_messages_length_by_sender[sender] / messages_count_by_sender[sender], 2
-        )
-        print(f"The average len of {sender.name}'s message is {average_message_length} symbols")
+    average_message_length_by_sender: Dict[User, int] = dict()
+    for sender in total_messages_length_by_sender:
+        average_message_length_by_sender[sender] = int(
+            100 * total_messages_length_by_sender[sender] / messages_count_by_sender[sender])
+    belongness = "\'s"
+    for sender in _sorted_by_value(average_message_length_by_sender):
+        print(f"The average len of {sender.name + belongness:22} message is {average_message_length_by_sender[sender] / 100:<6} symbols")
 
 
 def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
@@ -98,22 +104,30 @@ def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
 
 
 def _get_top_replies(replies_count: Dict[User, int]) -> List[Tuple[User, int]]:
+
     top_replies = list(replies_count.items())
     top_replies.sort(key=lambda x: -x[1])
     top_replies = top_replies[:3]
     return top_replies
 
 
+def _sorted_by_username(users_replies: List[User]) -> List[User]:
+    return sorted(users_replies, key=lambda user: user.name.lower())
+
+
 @statistic(name="most often replies")
 def print_most_often_replies(chat: Chat) -> None:
     replies_count_by_users = _get_replies_count_by_users(chat)
-    for sender in replies_count_by_users:
-        top_replies = _get_top_replies(replies_count_by_users[sender])
+    for sender in _sorted_by_username(chat.users):
+        if sender not in replies_count_by_users:
+            top_replies = []
+        else:
+            top_replies = _get_top_replies(replies_count_by_users[sender])
         if len(top_replies) == 0:
-            print(f"{sender.name} replies nobody", end="")
+            print(f"{sender.name:20} replies nobody")
         else:
             print(
-                f"{sender.name} most often replies",
+                f"{sender.name:20} most often replies",
                 ", ".join([f"{entry[0].name} ({entry[1]} times)" for entry in top_replies])
             )
 
@@ -121,13 +135,16 @@ def print_most_often_replies(chat: Chat) -> None:
 @statistic(name="most often replied by")
 def print_most_often_replies_to(chat: Chat) -> None:
     replies_count_to_users = _get_replies_count_to_users(chat)
-    for replied_sender in replies_count_to_users:
-        top_replies = _get_top_replies(replies_count_to_users[replied_sender])
+    for replied_sender in _sorted_by_username(chat.users):
+        if replied_sender not in replies_count_to_users:
+            top_replies = []
+        else:
+            top_replies = _get_top_replies(replies_count_to_users[replied_sender])
         if len(top_replies) == 0:
-            print(f"Nobody replies to {replied_sender.name}", end="")
+            print(f"{replied_sender.name:20} was replied by nobody")
         else:
             print(
-                f"{replied_sender.name} was most often replied by",
+                f"{replied_sender.name:20} was most often replied by",
                 ", ".join([f"{entry[0].name} ({entry[1]} times)" for entry in top_replies])
             )
 
