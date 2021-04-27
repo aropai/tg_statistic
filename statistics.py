@@ -98,23 +98,27 @@ def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
 
 
 def _get_top_replies(replies_count: Dict[User, int]) -> List[Tuple[User, int]]:
+
     top_replies = list(replies_count.items())
     top_replies.sort(key=lambda x: -x[1])
     top_replies = top_replies[:3]
     return top_replies
 
 
-def _sorted_by_username(users_replies: Dict[User, Dict[User, int]]) -> List[User]:
+def _sorted_by_username(users_replies: List[User]) -> List[User]:
     return sorted(users_replies, key=lambda user: user.name.lower())
 
 
 @statistic(name="most often replies")
 def print_most_often_replies(chat: Chat) -> None:
     replies_count_by_users = _get_replies_count_by_users(chat)
-    for sender in _sorted_by_username(replies_count_by_users):
-        top_replies = _get_top_replies(replies_count_by_users[sender])
+    for sender in _sorted_by_username(chat.users):
+        if sender not in replies_count_by_users:
+            top_replies = []
+        else:
+            top_replies = _get_top_replies(replies_count_by_users[sender])
         if len(top_replies) == 0:
-            print(f"{sender.name:20} replies nobody", end="")
+            print(f"{sender.name:20} replies nobody")
         else:
             print(
                 f"{sender.name:20} most often replies",
@@ -125,10 +129,13 @@ def print_most_often_replies(chat: Chat) -> None:
 @statistic(name="most often replied by")
 def print_most_often_replies_to(chat: Chat) -> None:
     replies_count_to_users = _get_replies_count_to_users(chat)
-    for replied_sender in _sorted_by_username(replies_count_to_users):
-        top_replies = _get_top_replies(replies_count_to_users[replied_sender])
+    for replied_sender in _sorted_by_username(chat.users):
+        if replied_sender not in replies_count_to_users:
+            top_replies = []
+        else:
+            top_replies = _get_top_replies(replies_count_to_users[replied_sender])
         if len(top_replies) == 0:
-            print(f"Nobody replies to {replied_sender.name}", end="")
+            print(f"{replied_sender.name:20} was replied by nobody")
         else:
             print(
                 f"{replied_sender.name:20} was most often replied by",
