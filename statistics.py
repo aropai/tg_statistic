@@ -68,7 +68,9 @@ def print_average_message_length_by_sender(chat: Chat) -> None:
             100 * total_messages_length_by_sender[sender] / messages_count_by_sender[sender])
     belongness = "\'s"
     for sender in _sorted_by_value(average_message_length_by_sender):
-        print(f"The average len of {sender.name + belongness:22} message is {average_message_length_by_sender[sender] / 100:<6} symbols")
+        print(
+            f"The average len of {sender.name + belongness:22} message is {average_message_length_by_sender[sender] / 100:<6} symbols"
+        )
 
 
 def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
@@ -104,7 +106,6 @@ def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
 
 
 def _get_top_replies(replies_count: Dict[User, int]) -> List[Tuple[User, int]]:
-
     top_replies = list(replies_count.items())
     top_replies.sort(key=lambda x: -x[1])
     top_replies = top_replies[:3]
@@ -163,9 +164,14 @@ def _parse_message_to_words(message: Message) -> List[str]:
     assert isinstance(message.text, list), "message.text is not a list"
     words: List[str] = []
     for submessage in message.text:
+        if isinstance(submessage, str):
+            words += _parse_string_to_words(submessage)
         if "text" not in submessage:
             continue
-        words += _parse_string_to_words(submessage["text"])
+        if "type" in submessage and submessage["type"] == "link":
+            words.append("<link>")
+        else:
+            words += _parse_string_to_words(submessage["text"])
     return words
 
 
