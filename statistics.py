@@ -3,6 +3,18 @@ from typing import Dict, Callable, List, Tuple
 import re
 
 BORDERS_LENGTH = 120
+FORBIDDEN_WORDS = ["то", "меж", "ага", "прежде", "нежели", "поперёк", "накануне", "сзади", "уж", "сбоку", "хоть", 
+                   "кроме", "ежели", "пока", "ну", "снизу", "во", "но", "сквозь", "по", "ли", "буде", "кабы", "нет", 
+                   "если", "вследствие", "под", "для", "ото", "же", "в", "возле", "вместо", "чуть", "вне", "дабы", 
+                   "посредством", "угу", "подле", "абы", "наискось", "да", "изнутри", "уже", "поверх", "до", "вокруг", 
+                   "внутри", "тоже", "из-под", "из-за", "коли", "коль", "ни", "словно", "свыше", "бы", "аж", "к", 
+                   "после", "либо", "над", "чтобы", "позади", "притом", "через", "впереди", "ведь", "лишь", "итак", 
+                   "разве", "ибо", "от", "причем", "сиречь", "при", "чтоб", "и", "без", "у", "вблизи", "покамест", 
+                   "поскольку", "сверху", "б", "вдоль", "посреди", "наподобие", "почти", "даже", "покуда", "насчёт", 
+                   "якобы", "из", "ввиду", "между", "с", "внутрь", "не", "против", "перед", "среди", "помимо", "близ", 
+                   "вопреки", "ради", "ль", "хотя", "а", "на", "едва", "около", "посредине", "или", "ан", "ой", "хм",
+                   "за"]
+
 
 
 def statistic(name: str) -> Callable[[Callable[[Chat], None]], Callable[[Chat], None]]:
@@ -184,9 +196,12 @@ def print_most_often_used_words(chat: Chat) -> None:
         if sender not in user_words:
             user_words[sender] = dict()
         for word in words:
-            if word.lower() not in user_words[sender]:
-                user_words[sender][word.lower()] = 0
-            user_words[sender][word.lower()] += 1
+            word = word.lower()
+            if word in FORBIDDEN_WORDS:
+                continue
+            if word not in user_words[sender]:
+                user_words[sender][word] = 0
+            user_words[sender][word] += 1
     for sender in chat.users:
         if sender not in user_words:
             print(f"{sender.name} writes nothing")
