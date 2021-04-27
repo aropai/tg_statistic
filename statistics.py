@@ -1,5 +1,5 @@
 from load_chat import Chat, User
-from typing import Dict, Callable, List, Tuple
+from typing import Dict, Callable, List, Tuple, Union
 
 BORDERS_LENGTH = 80
 
@@ -39,17 +39,21 @@ def _get_total_messages_length_by_sender(chat: Chat) -> Dict[User, int]:
     return total_messages_length_by_sender
 
 
+def _sorted_by_value(messages_by_sender: Dict[User, int]) -> List[User]:
+    return sorted(messages_by_sender, key=lambda sender: -messages_by_sender[sender])
+
+
 @statistic(name="number of messages")
 def print_messages_count_by_sender(chat: Chat) -> None:
     messages_count_by_sender = _get_messages_count_by_sender(chat)
-    for sender in messages_count_by_sender:
+    for sender in _sorted_by_value(messages_count_by_sender):
         print(f"{sender.name} wrote {messages_count_by_sender[sender]} message(s)")
 
 
 @statistic(name="total length of messages")
 def print_total_messages_length_by_sender(chat: Chat) -> None:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
-    for sender in total_messages_length_by_sender:
+    for sender in _sorted_by_value(total_messages_length_by_sender):
         print(f"{sender.name} wrote {total_messages_length_by_sender[sender]} symbol(s)")
 
 
@@ -57,17 +61,17 @@ def print_total_messages_length_by_sender(chat: Chat) -> None:
 def print_average_messages_length_by_sender(chat: Chat) -> None:
     total_messages_length_by_sender = _get_total_messages_length_by_sender(chat)
     messages_count_by_sender = _get_messages_count_by_sender(chat)
-    for sender in messages_count_by_sender:
-        average_message_length = round(
-            total_messages_length_by_sender[sender] / messages_count_by_sender[sender], 2
-        )
-        print(f"The average len of {sender.name}'s message is {average_message_length} symbols")
+    average_messages_length_by_sender: Dict[User, int] = dict()
+    for sender in total_messages_length_by_sender:
+        average_messages_length_by_sender[sender] = int(100 * total_messages_length_by_sender[sender] / messages_count_by_sender[sender])
+    for sender in _sorted_by_value(average_messages_length_by_sender):
+        print(f"The average len of {sender.name}'s message is {average_messages_length_by_sender[sender] / 100} symbols")
 
 
 def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
     replies_count_by_users: Dict[User, Dict[User, int]] = dict()
     for message in chat.messages:
-        if not message.reply_to_message_id:
+        if not message.reply_to_message_id or message.reply_to_message_id not in chat.message_by_id:
             continue
         sender = message.sender
         replied_message = chat.message_by_id[message.reply_to_message_id]
@@ -83,7 +87,7 @@ def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
 def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
     replies_count_to_users: Dict[User, Dict[User, int]] = dict()
     for message in chat.messages:
-        if not message.reply_to_message_id:
+        if not message.reply_to_message_id or message.reply_to_message_id not in chat.message_by_id:
             continue
         sender = message.sender
         replied_message = chat.message_by_id[message.reply_to_message_id]
