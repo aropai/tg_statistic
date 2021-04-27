@@ -1,5 +1,6 @@
-from load_chat import Chat, User
+from load_chat import Chat, User, Message
 from typing import Dict, Callable, List, Tuple
+import re
 
 BORDERS_LENGTH = 80
 
@@ -67,7 +68,7 @@ def print_average_messages_length_by_sender(chat: Chat) -> None:
 def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
     replies_count_by_users: Dict[User, Dict[User, int]] = dict()
     for message in chat.messages:
-        if not message.reply_to_message_id:
+        if not message.reply_to_message_id or message.reply_to_message_id not in chat.message_by_id:
             continue
         sender = message.sender
         replied_message = chat.message_by_id[message.reply_to_message_id]
@@ -83,7 +84,7 @@ def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
 def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
     replies_count_to_users: Dict[User, Dict[User, int]] = dict()
     for message in chat.messages:
-        if not message.reply_to_message_id:
+        if not message.reply_to_message_id or message.reply_to_message_id not in chat.message_by_id:
             continue
         sender = message.sender
         replied_message = chat.message_by_id[message.reply_to_message_id]
@@ -129,3 +130,45 @@ def print_most_often_replies_to(chat: Chat) -> None:
                 f"{replied_sender.name} was most often replied by",
                 ", ".join([f"{entry[0].name} ({entry[1]} times)" for entry in top_replies])
             )
+
+
+def _parse_string_to_words(text: str) -> List[str]:
+    text = re.sub("_", " ", text)
+    text = re.sub("-", "_", text)
+    text = re.sub("[\W]", " ", text)
+    words = re.sub("_", "-", text).split()
+    return words
+
+
+def _parse_message_to_words(message: Message) -> List[str]:
+    if isinstance(message.text, str):
+        return _parse_string_to_words(message.text)
+    assert isinstance(message.text, list), "message.text is not a list"
+    words: List[str] = []
+    for submessage in message.text:
+        if "text" not in submessage:
+            continue
+        words += _parse_string_to_words(submessage["text"])
+    return words
+
+
+@statistic(name="most often used words")
+def print_most_often_used_words(chat: Chat) -> None:
+    user_words: Dict[User, Dict[str, int]] = dict()
+    for message in chat.messages:
+        sender = message.sender
+        words = _parse_message_to_words(message)
+        if sender not in user_words:
+            user_words[sender] = dict()
+        for word in words:
+            if word.lower() not in user_words[sender]:
+                user_words[sender][word.lower()] = 0
+            user_words[sender][word.lower()] += 1
+    for sender in chat.users:
+        if sender not in user_words:
+            print(f"{sender.name} writes nothing")
+        else:
+            top_words = list(user_words[sender].items())
+            top_words.sort(key=lambda x: -x[1])
+            top_words = top_words[:10]
+            print(f"{sender.name} most often writes", ", ".join([f"{word[0]} ({word[1]} times)" for word in top_words]))
