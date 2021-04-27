@@ -1,5 +1,5 @@
 from load_chat import Chat, User
-from typing import Dict, Callable, List, Tuple, Union
+from typing import Dict, Callable, List, Tuple
 
 BORDERS_LENGTH = 80
 
