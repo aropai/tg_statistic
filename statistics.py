@@ -1,7 +1,20 @@
-from load_chat import Chat, User
+from load_chat import Chat, User, Message
 from typing import Dict, Callable, List, Tuple
+import regex
 
 BORDERS_LENGTH = 120
+WORD_REGEX = regex.compile(r"((\p{L}+-\p{L}+)|(\p{L}+))")
+FORBIDDEN_WORDS = ["то", "меж", "ага", "прежде", "нежели", "поперёк", "накануне", "сзади", "уж", "сбоку", "хоть",
+                   "кроме", "ежели", "пока", "ну", "снизу", "во", "но", "сквозь", "по", "ли", "буде", "кабы", "нет",
+                   "если", "вследствие", "под", "для", "ото", "же", "в", "возле", "вместо", "чуть", "вне", "дабы",
+                   "посредством", "угу", "подле", "абы", "наискось", "да", "изнутри", "уже", "поверх", "до", "вокруг",
+                   "внутри", "тоже", "из-под", "из-за", "коли", "коль", "ни", "словно", "свыше", "бы", "аж", "к",
+                   "после", "либо", "над", "чтобы", "позади", "притом", "через", "впереди", "ведь", "лишь", "итак",
+                   "разве", "ибо", "от", "причем", "сиречь", "при", "чтоб", "и", "без", "у", "вблизи", "покамест",
+                   "поскольку", "сверху", "б", "вдоль", "посреди", "наподобие", "почти", "даже", "покуда", "насчёт",
+                   "якобы", "из", "ввиду", "между", "с", "внутрь", "не", "против", "перед", "среди", "помимо", "близ",
+                   "вопреки", "ради", "ль", "хотя", "а", "на", "едва", "около", "посредине", "или", "ан", "ой", "хм",
+                   "за"]
 
 
 def statistic(name: str) -> Callable[[Callable[[Chat], None]], Callable[[Chat], None]]:
@@ -67,7 +80,9 @@ def print_average_message_length_by_sender(chat: Chat) -> None:
             100 * total_messages_length_by_sender[sender] / messages_count_by_sender[sender])
     belongness = "\'s"
     for sender in _sorted_by_value(average_message_length_by_sender):
-        print(f"The average len of {sender.name + belongness:22} message is {average_message_length_by_sender[sender] / 100:<6} symbols")
+        print(
+            f"The average len of {sender.name + belongness:22} message is {average_message_length_by_sender[sender] / 100:<6} symbols"
+        )
 
 
 def _get_replies_count_by_users(chat: Chat) -> Dict[User, Dict[User, int]]:
@@ -103,7 +118,6 @@ def _get_replies_count_to_users(chat: Chat) -> Dict[User, Dict[User, int]]:
 
 
 def _get_top_replies(replies_count: Dict[User, int]) -> List[Tuple[User, int]]:
-
     top_replies = list(replies_count.items())
     top_replies.sort(key=lambda x: -x[1])
     top_replies = top_replies[:3]
@@ -146,3 +160,49 @@ def print_most_often_replies_to(chat: Chat) -> None:
                 f"{replied_sender.name:20} was most often replied by",
                 ", ".join([f"{entry[0].name} ({entry[1]} times)" for entry in top_replies])
             )
+
+
+def _parse_string_to_words(text: str) -> List[str]:
+    return [match[0] for match in WORD_REGEX.findall(text)]
+
+
+def _parse_message_to_words(message: Message) -> List[str]:
+    if isinstance(message.text, str):
+        return _parse_string_to_words(message.text)
+    assert isinstance(message.text, list)
+    words: List[str] = []
+    for text_component in message.text:
+        if isinstance(text_component, str):
+            words += _parse_string_to_words(text_component)
+        if "text" not in text_component:
+            continue
+        if "type" in text_component and text_component["type"] == "link":
+            words.append("<link>")
+        else:
+            words += _parse_string_to_words(text_component["text"])
+    return words
+
+
+@statistic(name="most often used words")
+def print_most_often_used_words(chat: Chat) -> None:
+    words_count_by_user: Dict[User, Dict[str, int]] = dict()
+    for message in chat.messages:
+        sender = message.sender
+        words = _parse_message_to_words(message)
+        if sender not in words_count_by_user:
+            words_count_by_user[sender] = dict()
+        for word in words:
+            word = word.lower()
+            if word in FORBIDDEN_WORDS:
+                continue
+            if word not in words_count_by_user[sender]:
+                words_count_by_user[sender][word] = 0
+            words_count_by_user[sender][word] += 1
+    for sender in _sorted_by_username(chat.users):
+        if sender not in words_count_by_user:
+            print(f"{sender.name} writes nothing")
+        else:
+            top_words = list(words_count_by_user[sender].items())
+            top_words.sort(key=lambda x: -x[1])
+            top_words = top_words[:10]
+            print(f"{sender.name} most often writes", ", ".join([f"{word[0]} ({word[1]} times)" for word in top_words]))

@@ -43,6 +43,8 @@ class Chat:
         for message in parsed_chat["messages"]:
             if "from" not in message:
                 continue
+            if isinstance(message["from_id"], str) and message["from_id"].startswith("user"):
+                message["from_id"] = message["from_id"][4:]
             sender = chat.get_user(int(message["from_id"]), message["from"])
             parsed_message = Message(sender=sender, id=message["id"], reply_to_message_id=None, text=message["text"])
             if "reply_to_message_id" in message:
