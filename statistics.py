@@ -3,7 +3,7 @@ from typing import Dict, Callable, List, Tuple
 import regex
 
 BORDERS_LENGTH = 120
-WORD_REGEX = r"((\p{L}+-\p{L}+)|(\p{L}+))"
+WORD_REGEX = regex.compile(r"((\p{L}+-\p{L}+)|(\p{L}+))")
 FORBIDDEN_WORDS = ["то", "меж", "ага", "прежде", "нежели", "поперёк", "накануне", "сзади", "уж", "сбоку", "хоть", 
                    "кроме", "ежели", "пока", "ну", "снизу", "во", "но", "сквозь", "по", "ли", "буде", "кабы", "нет", 
                    "если", "вследствие", "под", "для", "ото", "же", "в", "возле", "вместо", "чуть", "вне", "дабы", 
@@ -164,10 +164,10 @@ def print_most_often_replies_to(chat: Chat) -> None:
 
 
 def _parse_string_to_words(text: str) -> List[str]:
-    word_tuples = regex.findall(WORD_REGEX, text)
+    matches = WORD_REGEX.findall(text)
     words = []
-    for (match, first_match, second_match) in word_tuples:
-        words.append(match)
+    for match in matches:
+        words.append(match[0])
     return words
 
 
