@@ -163,50 +163,53 @@ def print_most_often_replies_to(chat: Chat) -> None:
 
 
 def _parse_string_to_words(text: str) -> List[str]:
-    text = re.sub("_", " ", text)
-    text = re.sub("-", "_", text)
-    text = re.sub("[\W]", " ", text)
-    words = re.sub("_", "-", text).split()
+    word_tuples = re.findall("([a-zA-Zа-яА-Я]+-[a-zA-Zа-яА-Я]+)|([a-zA-Zа-яА-Я]+)", text)
+    words = []
+    for (first_match, second_match) in word_tuples:
+        if first_match != "":
+            words.append(first_match)
+        else:
+            words.append(second_match)
     return words
 
 
 def _parse_message_to_words(message: Message) -> List[str]:
     if isinstance(message.text, str):
         return _parse_string_to_words(message.text)
-    assert isinstance(message.text, list), "message.text is not a list"
+    assert isinstance(message.text, list)
     words: List[str] = []
-    for submessage in message.text:
-        if isinstance(submessage, str):
-            words += _parse_string_to_words(submessage)
-        if "text" not in submessage:
+    for text_component in message.text:
+        if isinstance(text_component, str):
+            words += _parse_string_to_words(text_component)
+        if "text" not in text_component:
             continue
-        if "type" in submessage and submessage["type"] == "link":
+        if "type" in text_component and text_component["type"] == "link":
             words.append("<link>")
         else:
-            words += _parse_string_to_words(submessage["text"])
+            words += _parse_string_to_words(text_component["text"])
     return words
 
 
 @statistic(name="most often used words")
 def print_most_often_used_words(chat: Chat) -> None:
-    user_words: Dict[User, Dict[str, int]] = dict()
+    words_count_by_user: Dict[User, Dict[str, int]] = dict()
     for message in chat.messages:
         sender = message.sender
         words = _parse_message_to_words(message)
-        if sender not in user_words:
-            user_words[sender] = dict()
+        if sender not in words_count_by_user:
+            words_count_by_user[sender] = dict()
         for word in words:
             word = word.lower()
             if word in FORBIDDEN_WORDS:
                 continue
-            if word not in user_words[sender]:
-                user_words[sender][word] = 0
-            user_words[sender][word] += 1
-    for sender in chat.users:
-        if sender not in user_words:
+            if word not in words_count_by_user[sender]:
+                words_count_by_user[sender][word] = 0
+            words_count_by_user[sender][word] += 1
+    for sender in _sorted_by_username(chat.users):
+        if sender not in words_count_by_user:
             print(f"{sender.name} writes nothing")
         else:
-            top_words = list(user_words[sender].items())
+            top_words = list(words_count_by_user[sender].items())
             top_words.sort(key=lambda x: -x[1])
             top_words = top_words[:10]
             print(f"{sender.name} most often writes", ", ".join([f"{word[0]} ({word[1]} times)" for word in top_words]))
