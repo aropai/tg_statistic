@@ -12,10 +12,16 @@ replied the most
 ## Usage
 1. **Export** the Telegram chat you want to analyze:
     * Open chat
-    * Click on 3 dots in the top right corner ![](Pictures/1337chat.jpg)
-    * Click on "Export chat history" ![](Pictures/1337export_chat.jpg)
+    * Click on 3 dots in the top right corner
+
+    ![](Pictures/1337chat.jpg)
+    * Click on "Export chat history"
+
+    ![](Pictures/1337export_chat.jpg)
     * Make everything like in the picture below and click on the "Export"
-    button ![](Pictures/1337exporting.jpg)
+    button
+
+    ![](Pictures/1337exporting.jpg)
     * After this your chat exporting will start. Wait till it ends
     * You will see a directory called like 'ChatExport_<today_date>'.
     There could be several files, the one you need is called "result.json"
