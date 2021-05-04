@@ -1,5 +1,5 @@
 # Telegram statistics
-Here you can find a program that somehow analyze your
+Here you can find a program that somehow analyzes your
 Telegram conversations. Right now **it
 can**:
 * count messages
@@ -11,7 +11,7 @@ replied the most
 
 ## Usage
 1. **Export** the Telegram chat you want to analyze:
-    * Open this chat
+    * Open chat
     * Click on 3 dots in the top right corner ![](Pictures/1337chat.jpg)
     * Click on "Export chat history" ![](Pictures/1337export_chat.jpg)
     * Make everything like in the picture below and click on the "Export"
@@ -20,8 +20,8 @@ replied the most
     * You will see a directory called like 'ChatExport_<today_date>'.
     There could be several files, the one you need is called "result.json"
 2. **Run** the program:
-    * Open Terminal, go to the project's directory and run
-    the program by using `./main.py ~/path/to/the/result.json`.
-    *Congratulations*, you did it!!! You should see the output like:
+    * Open Terminal, go to the repository directory and run
+    command `./main.py ~/path/to/the/result.json`.
+    You should see the output like:
     ![](Pictures/1337output1.jpg)
     ![](Pictures/1337output2.jpg)
